@@ -6,7 +6,7 @@ namespace adventofcode
     {
         static void Main(string[] args)
         {
-            new Day9("./data/9");
+            new DayTen("./data/10");
         }
     }
 }
