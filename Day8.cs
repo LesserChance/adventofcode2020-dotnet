@@ -33,7 +33,7 @@ class Day8
     public Day8(string filePath)
     {
         this.parseFile(filePath);
-        // this.runPartOne();
+        this.runPartOne();
         this.runPartTwo();
     }
 
