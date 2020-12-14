@@ -10,7 +10,6 @@ public class Location
 
 class Day11
 {
-    private delegate bool validateFunction(int x, int y, int i, int j);
     private List<char[]> data = new List<char[]>();
     private int rowSize = 0;
 
