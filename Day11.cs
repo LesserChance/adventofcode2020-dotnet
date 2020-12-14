@@ -10,6 +10,7 @@ public class Location
 
 class Day11
 {
+    public delegate char calculateNextRoud(List<char[]> data, int x, int y, int abandonAt);
     private List<char[]> data = new List<char[]>();
     private int rowSize = 0;
 
@@ -30,7 +31,7 @@ class Day11
 
     private void printState(List<char[]> data) {
         for (int i = 0; i < data.Count; i++) {
-            Console.Write(i + ":");
+            // Console.Write(i + ":");
             for (int j = 0; j < data[i].Length; j++) {
                 Console.Write(data[i][j]);
             }
@@ -47,7 +48,7 @@ class Day11
         return x < this.data.Count && y < this.rowSize && x >=  0 && y >= 0;
     }
 
-    private char calculateNextRound(List<char[]> data, int x, int y, int distance, int abandonAt) {
+    private char calculateNextRoundPart2(List<char[]> data, int x, int y, int abandonAt) {
         if (data[x][y] == Location.Floor) {
             return Location.Floor;
         }
@@ -56,7 +57,7 @@ class Day11
         int[] foundDirections = new int[8] {0,0,0,0,0,0,0,0};
         int[] occupiedDirections = new int[8] {0,0,0,0,0,0,0,0};
 
-        while (stepSize <= distance) {
+        while (foundDirections.Aggregate(0, (acc, seat) => acc + seat) < 8) {
             int curDirection = 0;
 
             int[] xSteps = {x-stepSize, x, x+stepSize};
@@ -72,6 +73,8 @@ class Day11
                                     occupiedDirections[curDirection] = 1;
                                 }
                             }
+                        } else {
+                            foundDirections[curDirection] = 1;
                         }
                         curDirection++;
                     }
@@ -92,14 +95,40 @@ class Day11
 
         return data[x][y];
     }
+    private char calculateNextRoundPart1(List<char[]> data, int x, int y, int abandonAt) {
+        if (data[x][y] == Location.Floor) {
+            return Location.Floor;
+        }
+        
+        int occupied = 0;
+        for (int i = Math.Max(0, x-1); i <= Math.Min(data.Count - 1, x+1); i++) {
+            for (int j = Math.Max(0, y-1); j <= Math.Min(data[i].Length - 1, y+1); j++) {
+                if (!(i == x && j == y)) {
+                    if (data[i][j] == Location.Occupied) {
+                        occupied++;
+                    }
+                }
+            }
+        }
+        if (data[x][y] == Location.Available && occupied == 0) {
+            return Location.Occupied;
+        }
+        
+        if (data[x][y] == Location.Occupied && occupied >= abandonAt) {
+            return Location.Available;
+        }
 
-    private List<char[]> nextRound(List<char[]> data, int distance = 1, int abandonAt = 4) {
+        return data[x][y];
+
+    }
+
+    private List<char[]> nextRound(List<char[]> data, int abandonAt, calculateNextRoud f) {
         List<char[]> result = new List<char[]>();
 
         for (int i = 0; i < data.Count; i++) {
             result.Insert(i, new char[data[i].Length]);
             for (int j = 0; j < data[i].Length; j++) {
-                result[i][j] = this.calculateNextRound(data, i, j, distance, abandonAt);
+                result[i][j] = f(data, i, j, abandonAt);
             }
         }
         return result;
@@ -108,12 +137,12 @@ class Day11
     private void runPartOne() {
         string lastRound = this.getRoundID(this.data);
 
-        List<char[]> nextRound = this.nextRound(this.data, 1, 4);
+        List<char[]> nextRound = this.nextRound(this.data, 4, this.calculateNextRoundPart1);
         string nextRoundId = this.getRoundID(nextRound);
 
         while (nextRoundId != lastRound) {
             lastRound = this.getRoundID(nextRound);
-            nextRound = this.nextRound(nextRound, 1, 4);
+            nextRound = this.nextRound(nextRound, 4, this.calculateNextRoundPart1);
             nextRoundId = this.getRoundID(nextRound);
         }
 
@@ -124,12 +153,12 @@ class Day11
     private void runPartTwo() {
         string lastRound = this.getRoundID(this.data);
 
-        List<char[]> nextRound = this.nextRound(this.data, 8, 5);
+        List<char[]> nextRound = this.nextRound(this.data, 5, this.calculateNextRoundPart2);
         string nextRoundId = this.getRoundID(nextRound);
 
         while (nextRoundId != lastRound) {
             lastRound = this.getRoundID(nextRound);
-            nextRound = this.nextRound(nextRound, 8, 5);
+            nextRound = this.nextRound(nextRound, 5, this.calculateNextRoundPart2);
             nextRoundId = this.getRoundID(nextRound);
         }
 
