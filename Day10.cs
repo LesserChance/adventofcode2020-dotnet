@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System;
 class DayTen
@@ -35,6 +33,7 @@ class DayTen
 
         Console.WriteLine("part one: " + (diffs[1] * diffs[3]));
     }
+    
     private List<List<int>> generatePaths(List<int> startPath, List<List<int>> paths){
         List<List<int>> result = new List<List<int>>();
 
